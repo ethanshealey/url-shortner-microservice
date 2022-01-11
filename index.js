@@ -30,6 +30,7 @@ app.post('/api/shorturl', (req, res) => {
           const id = Math.max.apply(Math, arr.map((url) => { return url.short_url })) + 1
           const obj = { 'original_url': URL, 'short_url': id }
           client.db('url-shortner').collection('urls').insertOne(obj)
+          console.log('INSERTED: ', obj)
           return res.json({ 'original_url': URL, 'short_url': id }) 
         })
       })
@@ -43,6 +44,7 @@ app.get('/api/shorturl/:id', (req, res) => {
     client.db('url-shortner').collection('urls').findOne({ short_url: req.params.id * 1}, (err, item) => {
      if(err) return res.json({ 'error': err })
      if(item) {
+       console.log('REDIRECTING TO: ', item.original_url)
        return res.redirect(item.original_url)
      }
      else return res.json({ 'error': 'No short URL found for the given input' })
