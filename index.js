@@ -16,15 +16,16 @@ app.get('/', (req, res) => {
 })
 
 app.post('/api/shorturl', (req, res) => {
-  //const regex = /^http[s]?:\/{2}([a-zA-Z0-9_-]+\.)?[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+$/
   const URL = req.body.url
-  dns.lookup(url, (err, addr, fam) => {
+  dns.lookup(URL.replace(/^http[s]?:\/\//, ''), (err, addr, fam) => {
     if(err) {
       console.log(err)
       return res.json({ 'error': 'invalid url' })
     }
+    console.log('hi')
     MongoClient.connect(process.env.MONGO_URI, (err, client) => {
       if(err) return res.json(err)
+      console.log('hi2')
       client.db('url-shortner').collection('urls').findOne({ 'original_url': URL }).then((item) => {
         if(item) return res.json({ 'original_url': item.original_url, 'short_url': item.short_url })
         client.db('url-shortner').collection('urls').find().toArray((err, arr) => {
