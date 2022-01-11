@@ -17,7 +17,7 @@ app.get('/', (req, res) => {
 
 app.post('/api/shorturl', (req, res) => {
   //const regex = /^http[s]?:\/{2}([a-zA-Z0-9_-]+\.)?[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+$/
-  const URL = req.body.URL
+  const URL = req.body.url
   dns.lookup(URL, (err, addr, fam) => {
     if(err) {
       console.log(err)
