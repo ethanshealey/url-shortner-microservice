@@ -3,6 +3,7 @@ const cors = require('cors')
 const path = require('path')
 const MongoClient = require('mongodb').MongoClient
 const dotenv = require('dotenv')
+const dns = require('dns')
 const app = express()
 
 dotenv.config()
@@ -15,18 +16,23 @@ app.get('/', (req, res) => {
 })
 
 app.post('/api/shorturl', (req, res) => {
-  const regex = /^http[s]?:\/{2}([a-zA-Z0-9_-]+\.)?[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+$/
+  //const regex = /^http[s]?:\/{2}([a-zA-Z0-9_-]+\.)?[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+$/
   const URL = req.body.URL
-  if(!regex.test(URL)) return res.json({ 'error': 'invalid url' })
-  MongoClient.connect(process.env.MONGO_URI, (err, client) => {
-    if(err) return res.json(err)
-    client.db('url-shortner').collection('urls').findOne({ 'original_url': URL }).then((item) => {
-      if(item) return res.json({ 'original_url': item.original_url, 'short_url': item.short_url })
-      client.db('url-shortner').collection('urls').find().toArray((err, arr) => {
-         const id = Math.max.apply(Math, arr.map((url) => { return url.short_url })) + 1
-         const obj = { 'original_url': URL, 'short_url': id }
-         client.db('url-shortner').collection('urls').insertOne(obj)
-         return res.json(obj) 
+  dns.lookup(URL, (err, addr, fam) => {
+    if(err) {
+      console.log(err)
+      return res.json({ 'error': 'invalid url' })
+    }
+    MongoClient.connect(process.env.MONGO_URI, (err, client) => {
+      if(err) return res.json(err)
+      client.db('url-shortner').collection('urls').findOne({ 'original_url': URL }).then((item) => {
+        if(item) return res.json({ 'original_url': item.original_url, 'short_url': item.short_url })
+        client.db('url-shortner').collection('urls').find().toArray((err, arr) => {
+          const id = Math.max.apply(Math, arr.map((url) => { return url.short_url })) + 1
+          const obj = { 'original_url': URL, 'short_url': id }
+          client.db('url-shortner').collection('urls').insertOne(obj)
+          return res.json(obj) 
+        })
       })
     })
   })
