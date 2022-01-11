@@ -17,6 +17,7 @@ app.get('/', (req, res) => {
 
 app.post('/api/shorturl', (req, res) => {
   const URL = req.body.url
+  console.log('POSTING URL: ', URL)
   dns.lookup(URL.replace(/^http[s]?:\/\//, '').split('/')[0], (err, addr, fam) => {
     if(err) {
       return res.json({ 'error': 'invalid url' })
@@ -37,6 +38,7 @@ app.post('/api/shorturl', (req, res) => {
 })
 
 app.get('/api/shorturl/:id', (req, res) => {
+  console.log('GETTING URL: ', req.params.id)
   MongoClient.connect(process.env.MONGO_URI, (err, client) => {
     client.db('url-shortner').collection('urls').findOne({ short_url: req.params.id * 1}, (err, item) => {
      if(err) return res.json({ 'error': err })
