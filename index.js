@@ -20,6 +20,7 @@ app.post('/api/shorturl', (req, res) => {
   console.log('POSTING URL: ', URL)
   dns.lookup(URL.replace(/^http[s]?:\/\//, '').split('/')[0], (err, addr, fam) => {
     if(err) {
+      console.log('INVALID: ', { URL: URL })
       return res.json({ error: 'Invalid URL' })
     }
     MongoClient.connect(process.env.MONGO_URI, (err, client) => {
