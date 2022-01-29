@@ -18,7 +18,7 @@ app.get('/', (req, res) => {
 app.post('/api/shorturl', (req, res) => {
   const URL = req.body.url
   console.log('POSTING URL: ', URL)
-  dns.lookup(URL.replace(/^.+\/{1,2}/, '').split('/')[0], (err, addr, fam) => {
+  dns.lookup(URL.replace(/^http[s]?:\/\//, '').split('/')[0], (err, addr, fam) => {
     if(err) {
       return res.json({ error: 'Invalid URL' })
     }
