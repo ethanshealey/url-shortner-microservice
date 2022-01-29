@@ -27,7 +27,8 @@ app.post('/api/shorturl', (req, res) => {
       client.db('url-shortner').collection('urls').findOne({ 'original_url': URL }).then((item) => {
         if(item) return res.json({ 'original_url': item.original_url, 'short_url': item.short_url })
         client.db('url-shortner').collection('urls').find().toArray((err, arr) => {
-          const id = Math.max.apply(Math, arr.map((url) => { return url.short_url })) + 1
+          let id = Math.max.apply(Math, arr.map((url) => { return url.short_url })) + 1
+          if(id === -Infinity) id = 1
           const obj = { 'original_url': URL, 'short_url': id }
           client.db('url-shortner').collection('urls').insertOne(obj)
           console.log('INSERTED: ', obj)
