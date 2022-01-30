@@ -10,6 +10,7 @@ dotenv.config()
 
 app.use(express.json())
 app.use(express.urlencoded())
+app.use(cors({optionSuccessStatus: 200}))
 
 app.get('/', (req, res) => {
   res.sendFile('./public/index.html', { root: __dirname })
